@@ -1,5 +1,5 @@
 /*
-  Estimating compute cost of NextFlow.io job run using AWS Batch using AWS Glue and Athena.
+  Estimating compute cost of NextFlow.io job run using AWS Batch, AWS Glue and Athena.
   ATHENA Tables and Views
   Tables are created in Athena using AWS Glue crawlers
   Queries below create views on those tables for estimating the cost of Nextflow jobs run on AWS batch.
