@@ -1,23 +1,11 @@
-########### Table1 ##########
-SELECT * FROM "athenacurcfn_customer_c_u_r_athena"."cost_and_usage_data_status" limit 10;
+/*
+  Estimating compute cost of NextFlow.io job run using AWS Batch using AWS Glue and Athena.
+  ATHENA Tables and Views
+  Tables are created in Athena using AWS Glue crawlers
+  Queries below create views on those tables for estimating the cost of Nextflow jobs run on AWS batch.
+*/
+--###################### VIEW: Per job costing #############################
 
-############# Table2 ############
-SELECT * FROM "athenacurcfn_customer_c_u_r_athena"."cost_and_usage_data_status_daily" limit 10;
-
-########## Tabel 3
-SELECT * FROM "athenacurcfn_customer_c_u_r_athena"."ecs" limit 10;
-
-######### Tabel 4
-SELECT * FROM "athenacurcfn_customer_c_u_r_athena"."customer_cur_athena" limit 10;
-
-######### Tabel 5
-SELECT * FROM "athenacurcfn_customer_c_u_r_athena"."customer_nextflow_trace_session" limit 10;
-
-####### Tabel 6
-SELECT * FROM "athenacurcfn_customer_c_u_r_athena"."parsed" limit 10;
-
-
-###################### View 1 per job costing 
 CREATE OR REPLACE VIEW per_job_costing AS 
 SELECT DISTINCT
   "a"."jobid"
@@ -39,7 +27,7 @@ INNER JOIN athenacurcfn_customer_c_u_r_athena.unique_jobid_for_container_arn vu 
 INNER JOIN athenacurcfn_customer_c_u_r_athena.vcpu_memory_factory vf ON ("vu"."ec2instanceid" = "vf"."ec2instanceid"))
 WHERE ("c"."line_item_usage_type" = 'USE1-ECS-EC2-GB-Hours')
 
-##########################  View 2 unique_jobid_for_container_arn
+---######################### VIEW: Unique_jobid_for_container_arn
 CREATE OR REPLACE VIEW unique_jobid_for_container_arn AS 
 SELECT DISTINCT
   "a"."jobid"
@@ -51,8 +39,7 @@ FROM
   (athenacurcfn_customer_c_u_r_athena.parsed a
 INNER JOIN athenacurcfn_customer_c_u_r_athena.ecs d ON ("trim"("a"."containerinstancearn") = "trim"("d"."containerinstancearn")))
 
-####################### View 3 vcpu_memory_factory
-
+--########################### View: vcpu_memory_factory
 CREATE OR REPLACE VIEW vcpu_memory_factory AS 
 SELECT DISTINCT
   "d"."ec2instanceid"
@@ -69,3 +56,22 @@ FROM
 INNER JOIN athenacurcfn_customer_c_u_r_athena.customer_cur_athena c ON ("c"."line_item_resource_id" = "d"."ec2instanceid"))
 WHERE ("c"."product_usagetype" LIKE 'BoxUsage:%')
 
+------------------------------ Tables created by Glue crawler on S3 ------------------------------
+
+--########### Table1 ##########
+SELECT * FROM "athenacurcfn_customer_c_u_r_athena"."cost_and_usage_data_status" limit 10;
+
+--############# Table2 ############
+SELECT * FROM "athenacurcfn_customer_c_u_r_athena"."cost_and_usage_data_status_daily" limit 10;
+
+--########## Tabel 3
+SELECT * FROM "athenacurcfn_customer_c_u_r_athena"."ecs" limit 10;
+
+--######### Tabel 4
+SELECT * FROM "athenacurcfn_customer_c_u_r_athena"."customer_cur_athena" limit 10;
+
+--######### Tabel 5
+SELECT * FROM "athenacurcfn_customer_c_u_r_athena"."customer_nextflow_trace_session" limit 10;
+
+--####### Tabel 6
+SELECT * FROM "athenacurcfn_customer_c_u_r_athena"."parsed" limit 10;
