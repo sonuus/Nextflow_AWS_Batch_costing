@@ -56,6 +56,7 @@ FROM
 INNER JOIN athenacurcfn_customer_c_u_r_athena.customer_cur_athena c ON ("c"."line_item_resource_id" = "d"."ec2instanceid"))
 WHERE ("c"."product_usagetype" LIKE 'BoxUsage:%')
 
+
 ------------------------------ Tables created by Glue crawler on S3 ------------------------------
 
 --########### Table1 ##########
@@ -75,3 +76,14 @@ SELECT * FROM "athenacurcfn_customer_c_u_r_athena"."customer_nextflow_trace_sess
 
 --####### Tabel 6
 SELECT * FROM "athenacurcfn_customer_c_u_r_athena"."parsed" limit 10;
+
+
+------------------------- JOIN: Final join to get cost agreegate per Nextflow job id  --------------------------------------
+
+SELECT b.sessionid,
+       sum(COST_PER_GB_HOURS) as JOB_COST
+FROM "athenacurcfn_[customer-name]_c_u_r_athena"."per_job_costing" a
+INNER JOIN "athenacurcfn_[customer-name]_c_u_r_athena"."[customer-name]_nextflow_trace_session" b
+    ON trim(a.jobid) = trim(b.native_id)       
+group by b.sessionid
+
